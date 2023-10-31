@@ -225,16 +225,16 @@ function botNotifSend(type, title, message) {
   let icon = '';
   switch(type) {
     case 'activated':
-      icon = 'icons/bot-64.png';
+      icon = 'icons/cloud-green.png';
       break;
     case 'deactivated':
-      icon = 'icons/bot-inactive-64.png';
+      icon = 'icons/cloud-black.png';
       break;
     case 'warning':
-      icon = 'icons/bot-warning-64.png';
+      icon = 'icons/cloud-red.png';
       break;
     default:
-      icon = 'icons/bot-64.png';
+      icon = 'icons/cloud-black.png';
   }
   chrome.notifications.create({
     type: 'basic',
@@ -250,16 +250,16 @@ function botSetIcon(type, title, badge) {
   let icon = '';
   switch(type) {
     case 'activated':
-      icon = 'icons/bot-16.png';
+      icon = 'icons/cloud-green.png';
       break;
     case 'deactivated':
-      icon = 'icons/bot-inactive-16.png';
+      icon = 'icons/cloud-black.png';
       break;
     case 'warning':
-      icon = 'icons/bot-warning-16.png';
+      icon = 'icons/cloud-red.png';
       break;
     default:
-      icon = 'icons/bot-16.png';
+      icon = 'icons/cloud-black.png';
   }
   chrome.action.setIcon({ path: {'16': icon} });
   if(title) {
