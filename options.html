@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <title>RTU Bot - Settings</title>
+    <style>
+      #wrapper {text-align: center; margin: 60px auto;}
+      #status {height: 1.5em; font-size:1.5em;}
+      #appUrl,#appTab,#appUser {height: 20px;}
+      #saveUrl {padding: 10px;}
+    </style>
+    <script src="options.js"></script>
+  </head>
+  <body>
+    <div id="wrapper">
+      <img id="bot-icon" src="icons/bot-128.png" />
+      <p id="status">Hello!</p>
+      <b>WEB APP URL:</b><br /><br />
+      <input type="url" id="appUrl" size="50" /><br /><br />
+      <b>EMAIL:</b><br /><br />
+      <input type="email" id="appUser" size="50" /><br /><br />
+      <b>GOOGLE SHEET TAB:</b><br /><br />
+      <input type="text" id="appTab" size="20" /><br /><br /><br />
+      <button type="button" id="saveSettings" disabled>SAVE SETTINGS</button>
+    </div>
+    </body>
+</html>
