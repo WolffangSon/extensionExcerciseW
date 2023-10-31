@@ -19,18 +19,18 @@ chrome.runtime.onStartup.addListener(() => {
 chrome.action.onClicked.addListener((tab) => {
 
   chrome.storage.local.get(['webappURL', 'sheetTab', 'botActive', 'refreshMins'], (result) => {
-    if(result.webappURL == '' || result.sheetTab == '') {
+    if (result.webappURL == '' || result.sheetTab == '') {
       botSetIcon('warning', 'Verint RTU Bot (No Webapp URL)');
       botNotifSend(
         'warning',
         'No Webapp URL!',
         "Please setup the webapp URL or the Sheet Tab in the extension's options page."
       );
-    } else if(result.botActive == 0) {
-      chrome.storage.local.set({tabId: tab.id}, () => {
+    } else if (result.botActive == 0) {
+      chrome.storage.local.set({ tabId: tab.id }, () => {
         activateBot(tab.id, 'UpdatingRT', result.refreshMins);
       });
-    } else if(result.botActive == 1) {
+    } else if (result.botActive == 1) {
       deactivateBot('UpdatingRT');
     }
   });
@@ -39,12 +39,12 @@ chrome.action.onClicked.addListener((tab) => {
 
 chrome.alarms.onAlarm.addListener((alarm) => {
 
-  switch(alarm.name) {
+  switch (alarm.name) {
     case 'UpdatingRT':
       chrome.storage.local.get(['botActive', 'tabId', 'webappURL', 'sheetTab', 'userEmail', 'refreshMins'], (result) => {
-        if(result.botActive == 1) {
+        if (result.botActive == 1) {
           processData(result.tabId, result.webappURL, result.sheetTab, result.userEmail, alarm.name, result.refreshMins);
-        } else if(result.botActive == 0) {
+        } else if (result.botActive == 0) {
           console.log('Warning: Verint RTU Bot is inactive! Nothing to do.');
         } else {
           console.log('Error: botActive variable is not set!');
@@ -58,8 +58,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
-  
-  switch(request.type) {
+
+  switch (request.type) {
     case 'activate':
       activateBot(request.tabId, 'UpdatingRT', 1);
       sendResponse({ status: 'process', message: '' });
@@ -75,9 +75,9 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 });
 
 function activateBot(tabId, alarmName, refreshMins) {
-  
-  chrome.tabs.sendMessage(tabId, {type: 'activate'}, (response) => {
-    if(chrome.runtime.lastError) {
+
+  chrome.tabs.sendMessage(tabId, { type: 'activate' }, (response) => {
+    if (chrome.runtime.lastError) {
       botSetIcon('warning', 'Verint RTU Bot (Not loaded)');
       botNotifSend(
         'warning',
@@ -86,8 +86,8 @@ function activateBot(tabId, alarmName, refreshMins) {
       );
     } else {
       setBotAlarm(alarmName, refreshMins);
-      chrome.storage.local.set({botActive: 1}, () => {
-        botSetIcon('activated', 'Verint RTU Bot (Active)', {text: `${refreshMins}`, color: 'green'});
+      chrome.storage.local.set({ botActive: 1 }, () => {
+        botSetIcon('activated', 'Verint RTU Bot (Active)', { text: `${refreshMins}`, color: 'green' });
         botNotifSend(
           'activated',
           'Verint RTU Bot Activated!',
@@ -103,8 +103,8 @@ function activateBot(tabId, alarmName, refreshMins) {
 function deactivateBot(alarmName) {
 
   unsetBotAlarm(alarmName);
-  chrome.storage.local.set({botActive: 0}, () => {
-    botSetIcon('deactivated', 'Verint RTU Bot (Inactive)', {text: ''});
+  chrome.storage.local.set({ botActive: 0 }, () => {
+    botSetIcon('deactivated', 'Verint RTU Bot (Inactive)', { text: '' });
     botNotifSend(
       'deactivated',
       'Verint RTU Bot Deactivated!',
@@ -117,7 +117,7 @@ function deactivateBot(alarmName) {
 
 function setBotAlarm(name, minutes) {
 
-  chrome.alarms.create(name, {periodInMinutes: minutes});
+  chrome.alarms.create(name, { periodInMinutes: minutes });
   console.log('Verint RTU Bot Alarm: ' + name + ' has been set every: ' + minutes + ' minutes');
 
 }
@@ -125,20 +125,20 @@ function setBotAlarm(name, minutes) {
 function unsetBotAlarm(name) {
 
   chrome.alarms.clear(name, (wasCleared) => {
-    if(wasCleared == true) {
+    if (wasCleared == true) {
       console.log('Verint RTU Bot Alarm: ' + name + '. Was unset.');
     } else {
       console.log('Verint RTU Bot Error: There was an issue unsetting the alarm: ' + name);
     }
   });
-  
+
 }
 
 async function postData(url, data) {
 
-  let result = { status: 0, rows: 0};
+  let result = { status: 0, rows: 0 };
   let resp = await fetch(url, {
-    headers: {'Content-Type': 'text/plain'},
+    headers: { 'Content-Type': 'text/plain' },
     method: 'POST',
     body: JSON.stringify(data)
   }).then((response) => {
@@ -158,40 +158,40 @@ async function postData(url, data) {
 
 function processData(tabId, url, sheetTab, userEmail, alarmName, refreshMins) {
 
-  chrome.tabs.sendMessage(tabId, {type: 'requestData'}, async (response) => {
-    if(chrome.runtime.lastError) {
+  chrome.tabs.sendMessage(tabId, { type: 'requestData' }, async (response) => {
+    if (chrome.runtime.lastError) {
       chrome.storage.local.get(['errorCounter'], (result) => {
-        if(result.errorCounter > 4) {
+        if (result.errorCounter > 4) {
           deactivateBot(alarmName);
           botNotifSend(
             'warning',
             'Verint Data Not Processed!',
             `Deactivating Verint RTU Bot due to ${result.errorCounter} consecutive failures.`
-            );
-          chrome.storage.local.set({errorCounter: 0});
+          );
+          chrome.storage.local.set({ errorCounter: 0 });
         } else {
           botNotifSend(
             'warning',
             'Verint Data Not Processed!',
             'Please reload or make sure you have Verint open and try again.'
           );
-          chrome.storage.local.set({errorCounter: result.errorCounter + 1});
+          chrome.storage.local.set({ errorCounter: result.errorCounter + 1 });
         }
-      });      
+      });
     } else {
-      if(response.status == 'success') {
-        let pData = {refresh: refreshMins, sTab: sheetTab, userEmail: userEmail, data: response.data};
+      if (response.status == 'success') {
+        let pData = { refresh: refreshMins, sTab: sheetTab, userEmail: userEmail, data: response.data };
         let postedData = await postData(url, pData);
-        if(postedData.status == 0) {
+        if (postedData.status == 0) {
           chrome.storage.local.get(['errorCounter'], (result) => {
-            if(result.errorCounter > 4) {
+            if (result.errorCounter > 4) {
               deactivateBot(alarmName);
               botNotifSend(
                 'warning',
                 'Verint Data Not Processed!',
                 `Deactivating Verint RTU Bot due to ${result.errorCounter} consecutive POST failures.`
-                );
-              chrome.storage.local.set({errorCounter: 0});
+              );
+              chrome.storage.local.set({ errorCounter: 0 });
             } else {
               botNotifSend(
                 'warning',
@@ -201,16 +201,16 @@ function processData(tabId, url, sheetTab, userEmail, alarmName, refreshMins) {
               chrome.storage.local.set({ errorCounter: result.errorCounter + 1 });
             }
           })
-        } else if(postedData.status == 1) {
-            chrome.storage.local.set({ errorCounter: 0 });
-        } else if(postedData.status == 2) {
+        } else if (postedData.status == 1) {
+          chrome.storage.local.set({ errorCounter: 0 });
+        } else if (postedData.status == 2) {
           botNotifSend(
             'warning',
             'Verint - Unable to Post!',
             `Another bot is running: ${postedData.user}`
           );
         }
-      } else if(response.status == 'error') {
+      } else if (response.status == 'error') {
         console.log('There was an issue retrieving the data!');
       } else {
         console.log('There was an unknowkn issue.');
@@ -221,9 +221,9 @@ function processData(tabId, url, sheetTab, userEmail, alarmName, refreshMins) {
 }
 
 function botNotifSend(type, title, message) {
-  
+
   let icon = '';
-  switch(type) {
+  switch (type) {
     case 'activated':
       icon = 'icons/cloud-green.png';
       break;
@@ -248,7 +248,7 @@ function botNotifSend(type, title, message) {
 function botSetIcon(type, title, badge) {
 
   let icon = '';
-  switch(type) {
+  switch (type) {
     case 'activated':
       icon = 'icons/cloud-green.png';
       break;
@@ -261,13 +261,13 @@ function botSetIcon(type, title, badge) {
     default:
       icon = 'icons/cloud-black.png';
   }
-  chrome.action.setIcon({ path: {'16': icon} });
-  if(title) {
+  chrome.action.setIcon({ path: { '16': icon } });
+  if (title) {
     chrome.action.setTitle({ title: title });
   }
-  if(badge) {
+  if (badge) {
     chrome.action.setBadgeText({ text: badge.text });
-    if(badge.color) {
+    if (badge.color) {
       chrome.action.setBadgeBackgroundColor({ color: badge.color });
     }
   }

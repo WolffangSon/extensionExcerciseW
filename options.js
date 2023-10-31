@@ -1,11 +1,11 @@
 chrome.storage.local.get(['webappURL', 'sheetTab', 'userEmail'], (result) => {
-  if(result.webappURL != '') {
+  if (result.webappURL != '') {
     document.getElementById('appUrl').value = result.webappURL;
   }
-  if(result.userEmail != '') {
+  if (result.userEmail != '') {
     document.getElementById('appUser').value = result.userEmail;
   }
-  if(result.sheetTab != '') {
+  if (result.sheetTab != '') {
     document.getElementById('appTab').value = result.sheetTab;
   }
   document.getElementById('saveSettings').disabled = false;
@@ -22,20 +22,20 @@ function saveSettings() {
   let validation = isValidUrl(input1);
 
   if (validation == true && url != '') {
-    chrome.storage.local.set({webappURL: url, sheetTab: sTab, userEmail: email}, () => {
-      document.getElementById('bot-icon').src = 'icons/bot-128.png';
+    chrome.storage.local.set({ webappURL: url, sheetTab: sTab, userEmail: email }, () => {
+      document.getElementById('bot-icon').src = 'icons/check.png';
       document.getElementById('status').textContent = 'Settings saved!';
       document.getElementById('status').style = 'color: green;';
     });
   } else {
-    document.getElementById('bot-icon').src = 'icons/bot-wrong-128.png';
+    document.getElementById('bot-icon').src = 'icons/cross.png';
     document.getElementById('status').textContent = 'This is not a valid URL!';
     document.getElementById('status').style = 'color: red;';
   }
 }
 
 function isValidUrl(input) {
-  if(!input.checkValidity()) {
+  if (!input.checkValidity()) {
     return false;
   } else {
     return true;
