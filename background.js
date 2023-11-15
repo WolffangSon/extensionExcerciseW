@@ -1,18 +1,20 @@
 chrome.runtime.onInstalled.addListener(() => {
   // Setting up variables
-  chrome.storage.local.set({ webappURL: '', sheetTab: '', userEmail: '', botActive: 0, tabId: 0, errorCounter: 0, refreshMins: 1 });
+  chrome.storage.local.set({ webappURL: '', sheetTab: '', userEmail: '', botActive: 0, tabId: 0, errorCounter: 0, refreshMins: 5 });
 
+
+
+  // calls the options page set at the manifest file, if not specified, it will create it from the options.html file
   if (chrome.runtime.openOptionsPage) {
     chrome.runtime.openOptionsPage();
   } else {
     chrome.tabs.create({ active: true, url: 'options.html' });
   }
-
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  // Reset variables
-  chrome.storage.local.set({ botActive: 0, tabId: 0, errorCounter: 0, refreshMins: 1 });
+  // Reset variables after it's installed and the user runs it again
+  chrome.storage.local.set({ botActive: 0, tabId: 0, errorCounter: 0, refreshMins: 5 });
 
 });
 
